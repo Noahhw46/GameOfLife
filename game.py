@@ -73,19 +73,22 @@ class Grid():
 
 class Menu():
     def __init__(self):
-        self.set_percent(0.5)
+        self.set_percent(0.2)
         self.clock_speed = 60
         self.randomize = False
+        self.seizure = False
         self.colors = {'Dead_Cell': (0,0,0), 'Alive_Cell': (255,255,255), 'Border': (255,255,255)}
         self.menu = pygame_menu.Menu('Game of Life', width, height, theme=pygame_menu.themes.THEME_DARK)
         self.menu.add.button('Play', self.start_the_game)
         self.menu.add.button('Auto Play', self.start_the_game_automatic)
         self.menu.add.toggle_switch('Randomize colors', default=False, onchange=self.toggle_randomize)
+        self.menu.add.toggle_switch('Seizure Mode', default=False, onchange=self.toggle_seizure)
+        self.menu.add.label('WARNING: Seizure Mode is not recommended for people with epilepsy. It is also not recommended for people who are not epileptic, as it is very annoying. Hold Space bar to use.', font_size=20, font_color=(255,0,0), wordwrap=True)
         self.menu.add.range_slider('Clock speed', range_values=(1, 60), increment=1, default=30, onchange=self.set_clock_speed)
         self.menu.add.range_slider('Percent of cells alive', range_values=(0, .99), increment=0.1, default=0.2, onchange=self.set_percent)
-        self.menu.add.selector('Dead cell color', [('Black', (0,0,0)), ('White', (255,255,255)), ('Red', (255,0,0)), ('Green', (0,255,0)), ('Blue', (0,0,255)), ('Yellow', (255,255,0)), ('Purple', (255,0,255)), ('Cyan', (0,255,255))], onchange=self.set_dead_cell_color, selector_id='Dead cell color', selection_effect=None, font_color=(0,0,0))
-        self.menu.add.selector('Alive cell color', [('White', (255, 255, 255)), ('Black', (0, 0, 0)), ('Red', (255,0,0)), ('Green', (0,255,0)), ('Blue', (0,0,255)), ('Yellow', (255,255,0)), ('Purple', (255,0,255)), ('Cyan', (0,255,255))], onchange=self.set_alive_cell_color, selector_id='Alive cell color', selection_effect=None, font_color=(255,255,255))
-        self.menu.add.selector('Border color', [('White', (255, 255, 255)), ('Black', (0, 0, 0)), ('Red', (255,0,0)), ('Green', (0,255,0)), ('Blue', (0,0,255)), ('Yellow', (255,255,0)), ('Purple', (255,0,255)), ('Cyan', (0,255,255))], onchange=self.set_border_color, selector_id='Border color', selection_effect=None, font_color=(255,255,255))
+        self.menu.add.selector('Dead cell color', [('Black', (0,0,0)), ('White', (255,255,255)), ('Red', (255,0,0)), ('Green', (0,255,0)), ('Blue', (0,0,255)), ('Yellow', (255,255,0)), ('Purple', (255,0,255)), ('Cyan', (0,255,255)), ('Random', (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))], onchange=self.set_dead_cell_color, selector_id='Dead cell color', selection_effect=None, font_color=(0,0,0))
+        self.menu.add.selector('Alive cell color', [('White', (255, 255, 255)), ('Black', (0, 0, 0)), ('Red', (255,0,0)), ('Green', (0,255,0)), ('Blue', (0,0,255)), ('Yellow', (255,255,0)), ('Purple', (255,0,255)), ('Cyan', (0,255,255)), ('Random', (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))], onchange=self.set_alive_cell_color, selector_id='Alive cell color', selection_effect=None, font_color=(255,255,255))
+        self.menu.add.selector('Border color', [('White', (255, 255, 255)), ('Black', (0, 0, 0)), ('Red', (255,0,0)), ('Green', (0,255,0)), ('Blue', (0,0,255)), ('Yellow', (255,255,0)), ('Purple', (255,0,255)), ('Cyan', (0,255,255)), ('Random', (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))], onchange=self.set_border_color, selector_id='Border color', selection_effect=None, font_color=(255,255,255))
         self.menu.add.button('Quit', pygame_menu.events.EXIT, button_id='Quit')
         self.menu.mainloop(screen)
     
@@ -93,6 +96,8 @@ class Menu():
         self.percent = percent
     def set_clock_speed(self, clock_speed):
         self.clock_speed = clock_speed
+    def toggle_seizure(self, value):
+        self.seizure = value
     def toggle_randomize(self, value):
         self.randomize = value
         dead_cell_selector = self.menu.get_widget('Dead cell color')
@@ -113,9 +118,9 @@ class Menu():
             self.menu.remove_widget(alive_cell_selector)
             self.menu.remove_widget(border_selector)
             self.menu.remove_widget(quit)
-            self.menu.add.selector('Dead cell color', [('Black', (0,0,0)), ('White', (255,255,255)), ('Red', (255,0,0)), ('Green', (0,255,0)), ('Blue', (0,0,255)), ('Yellow', (255,255,0)), ('Purple', (255,0,255)), ('Cyan', (0,255,255))], onchange=self.set_dead_cell_color, selector_id='Dead cell color', selection_effect=None, font_color=(0,0,0))
-            self.menu.add.selector('Alive cell color', [('White', (255, 255, 255)), ('Black', (0, 0, 0)), ('Red', (255,0,0)), ('Green', (0,255,0)), ('Blue', (0,0,255)), ('Yellow', (255,255,0)), ('Purple', (255,0,255)), ('Cyan', (0,255,255))], onchange=self.set_alive_cell_color, selector_id='Alive cell color', selection_effect=None, font_color=(255,255,255))
-            self.menu.add.selector('Border color', [('White', (255, 255, 255)), ('Black', (0, 0, 0)), ('Red', (255,0,0)), ('Green', (0,255,0)), ('Blue', (0,0,255)), ('Yellow', (255,255,0)), ('Purple', (255,0,255)), ('Cyan', (0,255,255))], onchange=self.set_border_color, selector_id='Border color', selection_effect=None, font_color=(255,255,255))
+            self.menu.add.selector('Dead cell color', [('Black', (0,0,0)), ('White', (255,255,255)), ('Red', (255,0,0)), ('Green', (0,255,0)), ('Blue', (0,0,255)), ('Yellow', (255,255,0)), ('Purple', (255,0,255)), ('Cyan', (0,255,255)), ('Random', (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))], onchange=self.set_dead_cell_color, selector_id='Dead cell color', selection_effect=None, font_color=(0,0,0))
+            self.menu.add.selector('Alive cell color', [('White', (255, 255, 255)), ('Black', (0, 0, 0)), ('Red', (255,0,0)), ('Green', (0,255,0)), ('Blue', (0,0,255)), ('Yellow', (255,255,0)), ('Purple', (255,0,255)), ('Cyan', (0,255,255)), ('Random', (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))], onchange=self.set_alive_cell_color, selector_id='Alive cell color', selection_effect=None, font_color=(255,255,255))
+            self.menu.add.selector('Border color', [('White', (255, 255, 255)), ('Black', (0, 0, 0)), ('Red', (255,0,0)), ('Green', (0,255,0)), ('Blue', (0,0,255)), ('Yellow', (255,255,0)), ('Purple', (255,0,255)), ('Cyan', (0,255,255)), ('Random', (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))], onchange=self.set_border_color, selector_id='Border color', selection_effect=None, font_color=(255,255,255))
             self.menu.add.button('Quit', pygame_menu.events.EXIT, button_id='Quit')
 
     def set_dead_cell_color(self, *selected_colors):
@@ -171,6 +176,8 @@ class Menu():
                             y = y // 40
                             grid.grid[y][x] = 0
                     if keys[pygame.K_SPACE]:
+                        if self.seizure == True:
+                            grid.randomize_colors()
                         grid.update()
                 
                 screen.fill((0,0,0))
@@ -191,7 +198,6 @@ class Menu():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-
             grid.update()
             screen.fill((0,0,0))
             grid.draw(screen)
